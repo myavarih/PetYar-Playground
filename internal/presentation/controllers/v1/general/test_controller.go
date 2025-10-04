@@ -3,6 +3,7 @@ package general
 import (
 	testdto "github.com/Hona-Tahlil/Backend/internal/application/dto/test"
 	"github.com/Hona-Tahlil/Backend/internal/application/service"
+	"github.com/Hona-Tahlil/Backend/internal/infrastructure/translation"
 	"github.com/Hona-Tahlil/Backend/internal/presentation/controllers"
 	"github.com/gin-gonic/gin"
 )
@@ -20,7 +21,7 @@ func Test(ctx *gin.Context) {
 		Num2: params.Num2,
 	}
 
-	res, err := service.Test(data)
+	res := service.Test(data)
 
-	controllers.Respond(ctx, res, err)
+	controllers.Respond(ctx, res, translation.Message{Text: "success.test", Params: []string{}})
 }
