@@ -31,7 +31,6 @@ func (rm *RecoveryMiddleware) Recover(ctx *gin.Context) {
 				} else {
 					controllers.Respond(ctx, nil, msgs)
 				}
-
 			}
 			ctx.Abort()
 		}
