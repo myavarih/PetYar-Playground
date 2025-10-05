@@ -9,7 +9,7 @@ import (
 
 func SetUpRouts(ginEngine *gin.Engine) {
 	ginEngine.Use(middleware.AddTranslator)
-	ginEngine.Use(middleware.NewRecoveryMiddleware(bootstrap.NewConstants()).Recover)
+	ginEngine.Use(middleware.NewRecoveryMiddleware(bootstrap.ProjectConfig.Constants).Recover)
 
 	v1 := ginEngine.Group("/v1")
 	httpv1.SetUpGeneralRouts(v1)

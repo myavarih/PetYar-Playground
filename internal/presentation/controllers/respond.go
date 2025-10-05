@@ -32,7 +32,7 @@ type multipleMessageResponse struct {
 }
 
 func Respond[T translation.Message | []translation.Message](ctx *gin.Context, data interface{}, msgs T) {
-	translator := GetTranslator(ctx, NewRespondController(bootstrap.NewConstants()).constants.Context.Translator)
+	translator := GetTranslator(ctx, NewRespondController(bootstrap.ProjectConfig.Constants).constants.Context.Translator)
 
 	switch msg := any(msgs).(type) {
 	case translation.Message:
@@ -47,7 +47,7 @@ func Respond[T translation.Message | []translation.Message](ctx *gin.Context, da
 			Data:       data,
 		})
 	case []translation.Message:
-		sCode := statuscodes.StatusCodes[msg[0].Text]
+		sCode := statuscodes.StatusCodes["errors."+msg[0].FieldError.Tag]
 		mms := multipleMessageResponse{
 			StatusCode: sCode,
 			Messages:   map[string]string{},

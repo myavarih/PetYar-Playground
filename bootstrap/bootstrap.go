@@ -6,8 +6,11 @@ type Config struct {
 }
 
 func Run() *Config {
-	return &Config{
+	ProjectConfig = &Config{
 		Constants: NewConstants(),
 		Env:       NewEnv(),
 	}
+	return ProjectConfig
 }
+
+var ProjectConfig *Config
