@@ -9,6 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// TODO: move translation.message here and change it only text and params
+
 type singleMessageResponse struct {
 	StatusCode int         `json:"statusCode"`
 	Message    string      `json:"message"`

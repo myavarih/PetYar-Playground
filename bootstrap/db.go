@@ -8,8 +8,10 @@ import (
 	"gorm.io/gorm"
 )
 
+// TODO: and this
 var DB *gorm.DB
 
+// TODO: move this to infra/database
 func DBMigration() {
 	dsn := GetDSN()
 
