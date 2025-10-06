@@ -40,6 +40,8 @@ func (rm *RecoveryMiddleware) Recover(ctx *gin.Context) {
 func (rm *RecoveryMiddleware) handleError(err error) []translation.Message {
 	if bindingErr, ok := err.(*exceptions.BindingError); ok {
 		return rm.handleBindingError(bindingErr)
+	} else if validationErrors, ok := err.(*exceptions.ValidationErrors); ok {
+		return rm.handleValidationErrors(validationErrors)
 	}
 	return rm.unhandledErrors(err)
 }
@@ -57,6 +59,17 @@ func (rm *RecoveryMiddleware) handleBindingError(bindingErr *exceptions.BindingE
 		Params: []string{},
 	}
 	return []translation.Message{msg}
+}
+
+func (rm *RecoveryMiddleware) handleValidationErrors(validationErrs *exceptions.ValidationErrors) []translation.Message {
+	var msgs []translation.Message
+	for i, fieldErr := range validationErrs.FieldErrors {
+		msgs[i] = translation.Message{
+			Text:       "errors.validation",
+			FieldError: &fieldErr,
+		}
+	}
+	return msgs
 }
 
 func (rm *RecoveryMiddleware) unhandledErrors(err error) []translation.Message {

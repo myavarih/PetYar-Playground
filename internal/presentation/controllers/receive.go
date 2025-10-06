@@ -1,8 +1,7 @@
 package controllers
 
 import (
-	"net/http"
-
+	"github.com/Hona-Tahlil/Backend/internal/domain/exceptions"
 	"github.com/Hona-Tahlil/Backend/internal/infrastructure/validation"
 	"github.com/gin-gonic/gin"
 )
@@ -11,18 +10,18 @@ func Receive[T any](ctx *gin.Context) T {
 	var params T
 
 	if err := ctx.ShouldBind(&params); err != nil {
-		// TODO: Proper Error Handling
-		ctx.JSON(http.StatusBadRequest, "wrong input")
+		bindingErr := exceptions.NewBindingError(err)
+		panic(bindingErr)
 	}
 
 	if err := ctx.ShouldBindUri(&params); err != nil {
-		// TODO: Proper Error Handling
-		ctx.JSON(http.StatusBadRequest, "wrong input")
+		bindingErr := exceptions.NewBindingError(err)
+		panic(bindingErr)
 	}
 
 	if err := ctx.ShouldBindQuery(&params); err != nil {
-		// TODO: Proper Error Handling
-		ctx.JSON(http.StatusBadRequest, "wrong input")
+		bindingErr := exceptions.NewBindingError(err)
+		panic(bindingErr)
 	}
 
 	validation.ValidateFields(params)
