@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// TODO: manteghie?
 type UserRepository struct {
 	db *gorm.DB
 }

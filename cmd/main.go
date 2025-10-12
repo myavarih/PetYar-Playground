@@ -7,6 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// TODO: Implement RBAC Response Format
+
 func main() {
 	gin.DisableConsoleColor()
 
