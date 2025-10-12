@@ -3,19 +3,12 @@ package translation
 import (
 	"log"
 
-	"github.com/Hona-Tahlil/Backend/internal/domain/exceptions"
 	"github.com/go-playground/locales/en"
 	"github.com/go-playground/locales/fa_IR"
 	ut "github.com/go-playground/universal-translator"
 )
 
 var translationMap map[string]map[string]string
-
-type Message struct {
-	Text       string
-	Params     []string
-	FieldError *exceptions.FieldError
-}
 
 func GetTranslator(locale string) ut.Translator {
 	uniTrans := ut.New(fa_IR.New(), en.New(), fa_IR.New())

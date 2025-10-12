@@ -1,15 +1,16 @@
 package controllers
 
 import (
+	"hona/backend/bootstrap"
 	"net/http"
 
-	"github.com/Hona-Tahlil/Backend/bootstrap"
-	statuscodes "github.com/Hona-Tahlil/Backend/internal/domain/statusCodes"
-	"github.com/Hona-Tahlil/Backend/internal/infrastructure/translation"
 	"github.com/gin-gonic/gin"
 )
 
-// TODO: move translation.message here and change it only text and params
+type Message struct {
+	Text   string
+	Params []string
+}
 
 type singleMessageResponse struct {
 	StatusCode int         `json:"statusCode"`
@@ -23,33 +24,31 @@ type multipleMessageResponse struct {
 	Data       interface{}       `json:"data"`
 }
 
-func Respond[T translation.Message | []translation.Message](ctx *gin.Context, data interface{}, msgs T) {
+func Respond[T Message | []Message](ctx *gin.Context, statusCode int, messages T, data interface{}) {
 	translator := GetTranslator(ctx, bootstrap.ProjectConfig.Constants.Context.Translator)
 
-	switch msg := any(msgs).(type) {
-	case translation.Message:
-		sCode := statuscodes.StatusCodes[msg.Text]
+	switch msg := any(messages).(type) {
+	case Message:
 		if msg.Text == "" {
-			msg.Text = http.StatusText(sCode)
+			msg.Text = http.StatusText(statusCode)
 		}
 		message, _ := translator.T(msg.Text, msg.Params...)
-		ctx.JSON(sCode, singleMessageResponse{
-			StatusCode: sCode,
+		ctx.JSON(statusCode, singleMessageResponse{
+			StatusCode: statusCode,
 			Message:    message,
 			Data:       data,
 		})
-	case []translation.Message:
-		sCode := statuscodes.StatusCodes[msg[0].Text]
+	case []Message:
 		mms := multipleMessageResponse{
-			StatusCode: sCode,
+			StatusCode: statusCode,
 			Messages:   map[string]string{},
 			Data:       data,
 		}
 		for _, ms := range msg {
-			translatedTagValue, _ := translator.T(ms.FieldError.Field)
-			translatedTag, _ := translator.T("errors."+ms.FieldError.Tag, translatedTagValue)
-			mms.Messages[ms.FieldError.Tag] = translatedTag
+			translatedFieldValue, _ := translator.T(ms.Params[0])
+			translatedTag, _ := translator.T(ms.Text, translatedFieldValue)
+			mms.Messages[ms.Params[0]] = translatedTag
 		}
-		ctx.JSON(sCode, mms)
+		ctx.JSON(statusCode, mms)
 	}
 }

@@ -3,7 +3,8 @@ package validation
 import (
 	"reflect"
 
-	"github.com/Hona-Tahlil/Backend/internal/domain/exceptions"
+	"hona/backend/internal/domain/exceptions"
+
 	"github.com/go-playground/validator/v10"
 )
 

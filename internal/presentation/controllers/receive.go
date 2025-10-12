@@ -1,8 +1,9 @@
 package controllers
 
 import (
-	"github.com/Hona-Tahlil/Backend/internal/domain/exceptions"
-	"github.com/Hona-Tahlil/Backend/internal/infrastructure/validation"
+	"hona/backend/internal/domain/exceptions"
+	"hona/backend/internal/infrastructure/validation"
+
 	"github.com/gin-gonic/gin"
 )
 
