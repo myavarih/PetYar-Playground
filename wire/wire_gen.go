@@ -9,30 +9,30 @@ package wire
 import (
 	"github.com/google/wire"
 	"hona/backend/bootstrap"
-	"hona/backend/internal/infrastructure/database"
+	"hona/backend/internal/infrastructure/repository/postgres"
 )
 
 // Injectors from wire.go:
 
 func InitializeApplication(container *bootstrap.Config) (*Application, error) {
-	postgresDatabase := database.NewPostgresDatabase()
-	wireDatabase := &Database{
+	postgresDatabase := postgres.NewPostgresDatabase()
+	database := &Database{
 		DB: postgresDatabase,
 	}
-	application := NewApplication(wireDatabase)
+	application := NewApplication(database)
 	return application, nil
 }
 
 // wire.go:
 
-var DatabaseProviderSet = wire.NewSet(database.NewPostgresDatabase, wire.Bind(new(database.Database), new(*database.PostgresDatabase)), wire.Struct(new(Database), "*"))
+var DatabaseProviderSet = wire.NewSet(postgres.NewPostgresDatabase, wire.Bind(new(postgres.Database), new(*postgres.PostgresDatabase)), wire.Struct(new(Database), "*"))
 
 var ProviderSet = wire.NewSet(
 	DatabaseProviderSet,
 )
 
 type Database struct {
-	DB database.Database
+	DB postgres.Database
 }
 
 type Application struct {

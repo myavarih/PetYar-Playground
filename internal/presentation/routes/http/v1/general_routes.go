@@ -2,7 +2,6 @@ package httpv1
 
 import (
 	"hona/backend/internal/application/service"
-	"hona/backend/internal/infrastructure/database"
 	"hona/backend/internal/infrastructure/repository/postgres"
 	"hona/backend/internal/presentation/controllers/v1/general"
 
@@ -10,8 +9,8 @@ import (
 )
 
 func SetUpRoutes(v1 *gin.RouterGroup) {
-	db := database.NewPostgresDatabase()
-	r := postgres.NewUserRepository(db)
+	db := postgres.NewPostgresDatabase()
+	r := postgres.NewUserRepository(db.DB)
 	s := service.NewGeneralService(r)
 	gc := general.NewGeneralController(s)
 

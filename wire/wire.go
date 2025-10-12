@@ -5,14 +5,14 @@ package wire
 
 import (
 	"hona/backend/bootstrap"
-	"hona/backend/internal/infrastructure/database"
+	"hona/backend/internal/infrastructure/repository/postgres"
 
 	"github.com/google/wire"
 )
 
 var DatabaseProviderSet = wire.NewSet(
-	database.NewPostgresDatabase,
-	wire.Bind(new(database.Database), new(*database.PostgresDatabase)),
+	postgres.NewPostgresDatabase,
+	wire.Bind(new(postgres.Database), new(*postgres.PostgresDatabase)),
 	wire.Struct(new(Database), "*"),
 )
 
@@ -21,7 +21,7 @@ var ProviderSet = wire.NewSet(
 )
 
 type Database struct {
-	DB database.Database
+	DB postgres.Database
 }
 
 type Application struct {

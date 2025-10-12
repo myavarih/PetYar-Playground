@@ -2,14 +2,15 @@ package postgres
 
 import (
 	"hona/backend/internal/domain/entity"
-	"hona/backend/internal/infrastructure/database"
+
+	"gorm.io/gorm"
 )
 
 type UserRepository struct {
-	db database.Database
+	db *gorm.DB
 }
 
-func NewUserRepository(db database.Database) *UserRepository {
+func NewUserRepository(db *gorm.DB) *UserRepository {
 	return &UserRepository{
 		db: db,
 	}
@@ -17,7 +18,7 @@ func NewUserRepository(db database.Database) *UserRepository {
 
 func (up *UserRepository) FindUserByEmail(email string) *entity.User {
 	var user entity.User
-	if err := up.db.GetDB().First(&user, email); err != nil {
+	if err := up.db.First(&user, email); err != nil {
 		// TODO: Proper error handling
 		panic(err)
 	}
