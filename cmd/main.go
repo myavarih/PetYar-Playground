@@ -7,6 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// TODO: Add Interfaces!
+
 // TODO: Implement RBAC Response Format
 
 func main() {
