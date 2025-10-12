@@ -9,8 +9,6 @@ import (
 
 // TODO: Add Interfaces!
 
-// TODO: Implement RBAC Response Format
-
 func main() {
 	gin.DisableConsoleColor()
 

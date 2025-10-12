@@ -18,7 +18,6 @@ func NewGeneralService(unitOfWork *postgres.UnitOfWork) *GeneralService {
 }
 
 func (gs *GeneralService) Login(loginInfo login.LoginRequest) login.LoginResponse {
-	// TODO: actually implement
 	user := gs.unitOfWork.Factory().UserRepository().FindUserByEmail(loginInfo.Email)
 
 	// TODO: not a good way
