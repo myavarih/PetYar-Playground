@@ -47,6 +47,8 @@ var Persian = map[string]interface{}{
 	"unlike":              "حذف لایک",
 	"corporationReview":   "بازبینی شرکت",
 	"errors": map[string]interface{}{
+		"min":                    "فیلد {0} باید حداقل 8 کاراکتر باشد",
+		"max":                    "فیلد {0} باید حداکثر 64 کاراکتر باشد",
 		"generic":                "خطایی رخ داده است، لطفا دوباره تلاش کنید.",
 		"numeric":                "`{0}` باید عدد باشد.",
 		"fileRequired":           "وارد کردن فایل اجباری است.",

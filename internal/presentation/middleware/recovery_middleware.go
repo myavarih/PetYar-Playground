@@ -22,7 +22,8 @@ func (rm *RecoveryMiddleware) Recover(ctx *gin.Context) {
 		if r := recover(); r != nil {
 			if err, ok := r.(error); ok {
 				msgs, statusCode := handleError(err)
-				if len(msgs) == 1 {
+				// TODO: not good? think of another way
+				if statusCode != 422 {
 					controllers.Respond(ctx, statusCode, msgs[0], nil)
 				} else {
 					controllers.Respond(ctx, statusCode, msgs, nil)

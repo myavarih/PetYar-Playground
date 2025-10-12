@@ -21,7 +21,7 @@ func NewGeneralController(generalService *service.GeneralService) *GeneralContro
 func (gc *GeneralController) Login(ctx *gin.Context) {
 	type loginParams struct {
 		Email    string `json:"email" validate:"required,email"`
-		Password string `json:"password" validate:"required"`
+		Password string `json:"password" validate:"required,min=8,max=64"`
 	}
 
 	params := controllers.Receive[loginParams](ctx)

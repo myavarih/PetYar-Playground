@@ -2,26 +2,33 @@ package service
 
 import (
 	"hona/backend/internal/application/dto/login"
+	"hona/backend/internal/application/dto/rbac"
+	"hona/backend/internal/infrastructure/jwt"
 	"hona/backend/internal/infrastructure/repository/postgres"
 )
 
 type GeneralService struct {
-	userRepository *postgres.UserRepository
+	unitOfWork *postgres.UnitOfWork
 }
 
-func NewGeneralService(userRepository *postgres.UserRepository) *GeneralService {
+func NewGeneralService(unitOfWork *postgres.UnitOfWork) *GeneralService {
 	return &GeneralService{
-		userRepository: userRepository,
+		unitOfWork: unitOfWork,
 	}
 }
 
 func (gs *GeneralService) Login(loginInfo login.LoginRequest) login.LoginResponse {
 	// TODO: actually implement
-	token := loginInfo.Email + "/" + loginInfo.Password
+	user := gs.unitOfWork.Factory().UserRepository().FindUserByEmail(loginInfo.Email)
 
-	// TODO: call repo?
+	// TODO: not a good way
+	js := jwt.NewJWTService(jwt.NewJWTKeyManager())
+	accessToken, refreshToken := js.GenerateTokens(user.ID)
 
 	return login.LoginResponse{
-		JWTToken: token,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		Name:         user.Name,
+		Permissions:  []rbac.PermissionResponse{},
 	}
 }

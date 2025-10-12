@@ -15,5 +15,5 @@ func SetUpRoutes(ginEngine *gin.Engine) {
 	ginEngine.Use(rm.Recover)
 
 	v1 := ginEngine.Group("/v1")
-	httpv1.SetUpRoutes(v1)
+	httpv1.SetUpGeneralRoutes(v1)
 }

@@ -8,10 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetUpRoutes(v1 *gin.RouterGroup) {
+func SetUpGeneralRoutes(v1 *gin.RouterGroup) {
 	db := postgres.NewPostgresDatabase()
-	r := postgres.NewUserRepository(db.DB)
-	s := service.NewGeneralService(r)
+	u := postgres.NewUnitOfWork(db.DB)
+	s := service.NewGeneralService(u)
 	gc := general.NewGeneralController(s)
 
 	auth := v1.Group("/auth")
