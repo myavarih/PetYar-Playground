@@ -32,7 +32,12 @@ func Respond[T Message | []Message](ctx *gin.Context, statusCode int, messages T
 		if msg.Text == "" {
 			msg.Text = http.StatusText(statusCode)
 		}
-		message, _ := translator.T(msg.Text, msg.Params...)
+		translatedParams := make([]string, 0)
+		for _, p := range msg.Params {
+			translatedParam, _ := translator.T(p)
+			translatedParams = append(translatedParams, translatedParam)
+		}
+		message, _ := translator.T(msg.Text, translatedParams...)
 		ctx.JSON(statusCode, singleMessageResponse{
 			StatusCode: statusCode,
 			Message:    message,

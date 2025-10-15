@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"hona/backend/internal/domain/entities"
+	"hona/backend/internal/domain/exceptions"
 
 	"gorm.io/gorm"
 )
@@ -17,9 +18,13 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 }
 
 func (up *UserRepository) FindUserByEmail(email string) *entities.User {
-	var user *entities.User
-	if user := up.db.First(user, email); user == nil {
-		panic("user not found")
+	var foundUser *entities.User
+
+	if result := up.db.First(foundUser, email); result.Error != nil {
+		notFoundErr := &exceptions.NotFoundError{
+			Item: "email",
+		}
+		panic(notFoundErr)
 	}
-	return user
+	return foundUser
 }

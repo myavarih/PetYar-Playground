@@ -40,6 +40,8 @@ func handleError(err error) ([]controllers.Message, int) {
 		return handleBindingError(bindingErr)
 	} else if validationErrs, ok := err.(*exceptions.ValidationErrors); ok {
 		return handleValidationErrors(validationErrs)
+	} else if notFoundErr, ok := err.(*exceptions.NotFoundError); ok {
+		return handleNotFoundError(notFoundErr)
 	}
 	return unhandledErrors(err)
 }
@@ -69,6 +71,14 @@ func handleValidationErrors(validationErrs *exceptions.ValidationErrors) ([]cont
 
 	}
 	return msgs, 422
+}
+
+func handleNotFoundError(notFoundErr *exceptions.NotFoundError) ([]controllers.Message, int) {
+	msg := controllers.Message{
+		Text:   "errors.notFound",
+		Params: []string{notFoundErr.Item},
+	}
+	return []controllers.Message{msg}, 400
 }
 
 func unhandledErrors(err error) ([]controllers.Message, int) {

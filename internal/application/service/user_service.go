@@ -5,6 +5,7 @@ import (
 	"hona/backend/internal/application/dto/user"
 	"hona/backend/internal/infrastructure/jwt"
 	"hona/backend/internal/infrastructure/repository/postgres"
+	"log"
 )
 
 type GeneralService struct {
@@ -21,6 +22,7 @@ func NewGeneralService(unitOfWork *postgres.UnitOfWork, jwtService *jwt.JWTServi
 
 func (gs *GeneralService) Login(loginInfo user.LoginRequest) user.LoginResponse {
 	foundUser := gs.unitOfWork.Factory().UserRepository().FindUserByEmail(loginInfo.Email)
+	log.Println(foundUser)
 
 	accessToken, refreshToken := gs.jwtService.GenerateTokens(foundUser.ID)
 
