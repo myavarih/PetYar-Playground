@@ -1,7 +1,7 @@
 package general
 
 import (
-	"hona/backend/internal/application/dto/login"
+	"hona/backend/internal/application/dto/user"
 	"hona/backend/internal/application/service"
 	"hona/backend/internal/presentation/controllers"
 
@@ -25,7 +25,7 @@ func (gc *GeneralController) Login(ctx *gin.Context) {
 	}
 
 	params := controllers.Receive[loginParams](ctx)
-	loginInfo := login.LoginRequest{
+	loginInfo := user.LoginRequest{
 		Email:    params.Email,
 		Password: params.Password,
 	}
@@ -33,7 +33,7 @@ func (gc *GeneralController) Login(ctx *gin.Context) {
 	res := gc.generalService.Login(loginInfo)
 
 	msg := controllers.Message{
-		Text:   "success.login",
+		Text:   "successMessage.login",
 		Params: []string{},
 	}
 	controllers.Respond(ctx, 200, msg, res)

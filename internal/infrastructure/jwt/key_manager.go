@@ -2,6 +2,7 @@ package jwt
 
 import (
 	"crypto/rsa"
+	"hona/backend/bootstrap"
 	"os"
 	"sync"
 
@@ -18,7 +19,10 @@ type JWTKeyManager struct {
 }
 
 func NewJWTKeyManager() *JWTKeyManager {
-	return &JWTKeyManager{}
+	return &JWTKeyManager{
+		privateKeyPath: bootstrap.ProjectConfig.Constants.JWTKeysPath.PrivateKey,
+		publicKeyPath:  bootstrap.ProjectConfig.Constants.JWTKeysPath.PublicKey,
+	}
 }
 
 func (k *JWTKeyManager) LoadKeys() {
@@ -51,9 +55,6 @@ func (k *JWTKeyManager) LoadKeys() {
 }
 
 func (k *JWTKeyManager) GetPrivateKey() *rsa.PrivateKey {
-	k.mutex.RLock()
-	defer k.mutex.RUnlock()
-
 	if !k.isLoaded {
 		k.LoadKeys()
 		return k.privateKey
@@ -62,9 +63,6 @@ func (k *JWTKeyManager) GetPrivateKey() *rsa.PrivateKey {
 }
 
 func (k *JWTKeyManager) GetPublicKey() *rsa.PublicKey {
-	k.mutex.RLock()
-	defer k.mutex.RUnlock()
-
 	if !k.isLoaded {
 		k.LoadKeys()
 		return k.publicKey

@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	"hona/backend/internal/domain/entity"
+	"hona/backend/internal/domain/entities"
 
 	"gorm.io/gorm"
 )
@@ -17,8 +17,8 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 	}
 }
 
-func (up *UserRepository) FindUserByEmail(email string) *entity.User {
-	var user *entity.User
+func (up *UserRepository) FindUserByEmail(email string) *entities.User {
+	var user *entities.User
 	if user := up.db.First(user, email); user == nil {
 		// TODO: Proper error handling
 		panic("user not found")

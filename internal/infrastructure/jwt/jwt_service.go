@@ -18,6 +18,7 @@ func NewJWTService(keyManager *JWTKeyManager) *JWTService {
 	}
 }
 
+// TODO: doesn't seem to work / request doesn't process and returns nothing
 func (js *JWTService) GenerateTokens(userID uint) (accessTokenString string, refreshTokenString string) {
 	accessTokenClaims, refreshTokenClaims := js.GenerateClaims(userID)
 

@@ -1,33 +1,50 @@
 package service
 
 import (
-	"hona/backend/internal/application/dto/login"
 	"hona/backend/internal/application/dto/rbac"
+	"hona/backend/internal/application/dto/user"
 	"hona/backend/internal/infrastructure/jwt"
 	"hona/backend/internal/infrastructure/repository/postgres"
 )
 
 type GeneralService struct {
+	jwtService *jwt.JWTService
 	unitOfWork *postgres.UnitOfWork
 }
 
-func NewGeneralService(unitOfWork *postgres.UnitOfWork) *GeneralService {
+func NewGeneralService(unitOfWork *postgres.UnitOfWork, jwtService *jwt.JWTService) *GeneralService {
 	return &GeneralService{
 		unitOfWork: unitOfWork,
+		jwtService: jwtService,
 	}
 }
 
-func (gs *GeneralService) Login(loginInfo login.LoginRequest) login.LoginResponse {
-	user := gs.unitOfWork.Factory().UserRepository().FindUserByEmail(loginInfo.Email)
+func (gs *GeneralService) Login(loginInfo user.LoginRequest) user.LoginResponse {
+	foundUser := gs.unitOfWork.Factory().UserRepository().FindUserByEmail(loginInfo.Email)
 
-	// TODO: not a good way
-	js := jwt.NewJWTService(jwt.NewJWTKeyManager())
-	accessToken, refreshToken := js.GenerateTokens(user.ID)
+	accessToken, refreshToken := gs.jwtService.GenerateTokens(foundUser.ID)
 
-	return login.LoginResponse{
+	// foundUser := entities.User{}
+
+	permissions := foundUser.Role.Permissions
+
+	p := make([]rbac.PermissionResponse, 0)
+
+	for _, per := range permissions {
+		p = append(p, rbac.PermissionResponse{
+			ID:   per.ID,
+			Name: per.Name,
+		})
+	}
+
+	return user.LoginResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
-		Name:         user.Name,
-		Permissions:  []rbac.PermissionResponse{},
+		Name:         foundUser.Name,
+		Role: rbac.RoleResponse{
+			ID:          foundUser.Role.ID,
+			Name:        foundUser.Role.Name,
+			Permissions: p,
+		},
 	}
 }

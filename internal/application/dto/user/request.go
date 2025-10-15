@@ -1,4 +1,4 @@
-package login
+package user
 
 type LoginRequest struct {
 	Email    string

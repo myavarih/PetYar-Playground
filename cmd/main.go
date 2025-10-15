@@ -2,6 +2,7 @@ package main
 
 import (
 	"hona/backend/bootstrap"
+	"hona/backend/internal/infrastructure/repository/postgres"
 	"hona/backend/internal/presentation/routes"
 
 	"github.com/gin-gonic/gin"
@@ -17,6 +18,8 @@ func main() {
 	ginEngine := gin.Default()
 
 	bootstrap.Run()
+
+	postgres.NewPostgresDatabase()
 
 	routes.SetUpRoutes(ginEngine)
 
