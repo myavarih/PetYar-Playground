@@ -23,7 +23,6 @@ type PostgresDatabase struct {
 }
 
 func (pgx *PostgresDatabase) GetDB() *gorm.DB {
-	// TODO: ? was dbInstance.DB - which is better?
 	return pgx.DB
 }
 

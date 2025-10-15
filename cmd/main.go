@@ -8,8 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// TODO: Add Interfaces!
-
 func main() {
 	gin.DisableConsoleColor()
 
