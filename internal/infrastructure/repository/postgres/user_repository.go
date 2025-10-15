@@ -20,11 +20,11 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 func (up *UserRepository) FindUserByEmail(email string) *entities.User {
 	var foundUser *entities.User
 
-	if result := up.db.First(foundUser, email); result.Error != nil {
-		notFoundErr := &exceptions.NotFoundError{
-			Item: "email",
+	if result := up.db.First(foundUser, "email = ?", email); result.Error != nil {
+		invalidCredentialsErr := &exceptions.AuthError{
+			Type: "INVALID_CREDENTIALS",
 		}
-		panic(notFoundErr)
+		panic(invalidCredentialsErr)
 	}
 	return foundUser
 }

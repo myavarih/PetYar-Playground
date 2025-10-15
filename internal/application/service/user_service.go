@@ -3,9 +3,11 @@ package service
 import (
 	"hona/backend/internal/application/dto/rbac"
 	"hona/backend/internal/application/dto/user"
+	"hona/backend/internal/domain/exceptions"
 	"hona/backend/internal/infrastructure/jwt"
 	"hona/backend/internal/infrastructure/repository/postgres"
-	"log"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type GeneralService struct {
@@ -22,7 +24,13 @@ func NewGeneralService(unitOfWork *postgres.UnitOfWork, jwtService *jwt.JWTServi
 
 func (gs *GeneralService) Login(loginInfo user.LoginRequest) user.LoginResponse {
 	foundUser := gs.unitOfWork.Factory().UserRepository().FindUserByEmail(loginInfo.Email)
-	log.Println(foundUser)
+
+	if err := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(loginInfo.Password)); err != nil {
+		invalidCredentialsErr := &exceptions.AuthError{
+			Type: "INVALID_CREDENTIALS",
+		}
+		panic(invalidCredentialsErr)
+	}
 
 	accessToken, refreshToken := gs.jwtService.GenerateTokens(foundUser.ID)
 
@@ -42,7 +50,6 @@ func (gs *GeneralService) Login(loginInfo user.LoginRequest) user.LoginResponse 
 	return user.LoginResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
-		Name:         foundUser.Name,
 		Role: rbac.RoleResponse{
 			ID:          foundUser.Role.ID,
 			Name:        foundUser.Role.Name,

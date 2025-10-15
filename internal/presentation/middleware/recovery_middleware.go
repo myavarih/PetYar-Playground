@@ -42,6 +42,8 @@ func handleError(err error) ([]controllers.Message, int) {
 		return handleValidationErrors(validationErrs)
 	} else if notFoundErr, ok := err.(*exceptions.NotFoundError); ok {
 		return handleNotFoundError(notFoundErr)
+	} else if authErr, ok := err.(*exceptions.AuthError); ok {
+		return handleAuthError(authErr)
 	}
 	return unhandledErrors(err)
 }
@@ -79,6 +81,16 @@ func handleNotFoundError(notFoundErr *exceptions.NotFoundError) ([]controllers.M
 		Params: []string{notFoundErr.Item},
 	}
 	return []controllers.Message{msg}, 400
+}
+
+func handleAuthError(authErr *exceptions.AuthError) ([]controllers.Message, int) {
+	if authErr.Type == "INVALID_CREDENTIALS" {
+		msg := controllers.Message{
+			Text: "errors.invalidAuthCredentials",
+		}
+		return []controllers.Message{msg}, 401
+	}
+	return []controllers.Message{}, 401
 }
 
 func unhandledErrors(err error) ([]controllers.Message, int) {
