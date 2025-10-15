@@ -13,7 +13,7 @@ func SetUpGeneralRoutes(v1 *gin.RouterGroup) {
 	db := postgres.NewPostgresDatabase()
 	u := postgres.NewUnitOfWork(db.DB)
 	js := jwt.NewJWTService(jwt.NewJWTKeyManager())
-	s := service.NewGeneralService(u, js)
+	s := service.NewUserService(u, js)
 	gc := general.NewGeneralController(s)
 
 	auth := v1.Group("/auth")

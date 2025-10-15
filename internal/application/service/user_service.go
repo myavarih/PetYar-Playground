@@ -10,20 +10,20 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type GeneralService struct {
+type UserService struct {
 	jwtService *jwt.JWTService
 	unitOfWork *postgres.UnitOfWork
 }
 
-func NewGeneralService(unitOfWork *postgres.UnitOfWork, jwtService *jwt.JWTService) *GeneralService {
-	return &GeneralService{
+func NewUserService(unitOfWork *postgres.UnitOfWork, jwtService *jwt.JWTService) *UserService {
+	return &UserService{
 		unitOfWork: unitOfWork,
 		jwtService: jwtService,
 	}
 }
 
-func (gs *GeneralService) Login(loginInfo user.LoginRequest) user.LoginResponse {
-	foundUser := gs.unitOfWork.Factory().UserRepository().FindUserByEmail(loginInfo.Email)
+func (us *UserService) Login(loginInfo user.LoginRequest) user.LoginResponse {
+	foundUser := us.unitOfWork.Factory().UserRepository().FindUserByEmail(loginInfo.Email)
 
 	if err := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(loginInfo.Password)); err != nil {
 		invalidCredentialsErr := &exceptions.AuthError{
@@ -32,7 +32,7 @@ func (gs *GeneralService) Login(loginInfo user.LoginRequest) user.LoginResponse 
 		panic(invalidCredentialsErr)
 	}
 
-	accessToken, refreshToken := gs.jwtService.GenerateTokens(foundUser.ID)
+	accessToken, refreshToken := us.jwtService.GenerateTokens(foundUser.ID)
 
 	// foundUser := entities.User{}
 

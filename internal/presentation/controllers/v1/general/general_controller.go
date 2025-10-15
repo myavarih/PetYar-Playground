@@ -9,10 +9,10 @@ import (
 )
 
 type GeneralController struct {
-	generalService *service.GeneralService
+	generalService *service.UserService
 }
 
-func NewGeneralController(generalService *service.GeneralService) *GeneralController {
+func NewGeneralController(generalService *service.UserService) *GeneralController {
 	return &GeneralController{
 		generalService: generalService,
 	}
