@@ -34,8 +34,6 @@ func (us *UserService) Login(loginInfo user.LoginRequest) user.LoginResponse {
 
 	accessToken, refreshToken := us.jwtService.GenerateTokens(foundUser.ID)
 
-	// foundUser := entities.User{}
-
 	permissions := foundUser.Role.Permissions
 
 	p := make([]rbac.PermissionResponse, 0)
@@ -43,7 +41,7 @@ func (us *UserService) Login(loginInfo user.LoginRequest) user.LoginResponse {
 	for _, per := range permissions {
 		p = append(p, rbac.PermissionResponse{
 			ID:   per.ID,
-			Name: per.Name,
+			Name: per.Type.String(),
 		})
 	}
 
@@ -52,7 +50,7 @@ func (us *UserService) Login(loginInfo user.LoginRequest) user.LoginResponse {
 		RefreshToken: refreshToken,
 		Role: rbac.RoleResponse{
 			ID:          foundUser.Role.ID,
-			Name:        foundUser.Role.Name,
+			Name:        foundUser.Role.Type.String(),
 			Permissions: p,
 		},
 	}

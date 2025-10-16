@@ -27,7 +27,7 @@ func (rm *RBACMiddleware) HasAccess(allowedPermissions []enums.Permission) gin.H
 		var allowed bool = false
 		for _, permission := range allowedPermissions {
 			for _, p := range user.Role.Permissions {
-				if p.Name == permission.String() {
+				if p.Type == permission {
 					allowed = true
 					break
 				}
