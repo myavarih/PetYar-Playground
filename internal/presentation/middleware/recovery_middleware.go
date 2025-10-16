@@ -89,6 +89,11 @@ func handleAuthError(authErr *exceptions.AuthError) ([]controllers.Message, int)
 			Text: "errors.invalidAuthCredentials",
 		}
 		return []controllers.Message{msg}, 401
+	} else if authErr.Type == "UNAUTHORIZED" {
+		msg := controllers.Message{
+			Text: "errors.unauthorized",
+		}
+		return []controllers.Message{msg}, 401
 	}
 	return []controllers.Message{}, 401
 }

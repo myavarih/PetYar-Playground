@@ -7,6 +7,7 @@ type Constants struct {
 
 type Context struct {
 	Translator string
+	ID         string
 }
 
 type JWTKeysPath struct {
@@ -18,6 +19,7 @@ func NewConstants() *Constants {
 	return &Constants{
 		Context: Context{
 			Translator: "translator",
+			ID:         "id",
 		},
 		JWTKeysPath: JWTKeysPath{
 			PublicKey:  "./internal/infrastructure/jwt/public_key.pem",

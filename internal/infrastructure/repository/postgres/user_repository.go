@@ -28,3 +28,15 @@ func (up *UserRepository) FindUserByEmail(email string) *entities.User {
 	}
 	return foundUser
 }
+
+func (up *UserRepository) FindUserByID(userID uint) *entities.User {
+	var foundUser *entities.User
+
+	if result := up.db.First(foundUser, userID); result.Error != nil {
+		// invalidCredentialsErr := &exceptions.AuthError{
+		// 	Type: "INVALID_CREDENTIALS",
+		// }
+		// panic(invalidCredentialsErr)
+	}
+	return foundUser
+}
