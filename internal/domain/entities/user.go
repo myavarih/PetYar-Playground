@@ -11,6 +11,7 @@ type User struct {
 	Email       string `gorm:"not null"`
 	Password    string `gorm:"not null"`
 	Name        string
+	Gender      string // make enum later
 	Address     string
 	BirthDate   time.Time
 	Phone       string
@@ -18,6 +19,8 @@ type User struct {
 	PictureLink string
 	Wallet      Wallet    `gorm:"foreignKey:UserID"`
 	Requests    []Request `gorm:"foreignKey:UserID"`
-	Role        Role      `gorm:"foreignKey:RoleID"`
-	RoleID      uint
+	Roles       []Role    `gorm:"many2many:user_role"`
+	Pets        []Pet     `gorm:"foreignKey:UserID"`
+	PetSitter   PetSitter `gorm:"foreignKey:UserID"`
+	Comments    []Comment `gorm:"foreignKey:UserID"`
 }

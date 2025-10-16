@@ -1,9 +1,13 @@
 package entities
 
-import "hona/backend/internal/domain/enums"
+import (
+	"hona/backend/internal/domain/enums"
+
+	"gorm.io/gorm"
+)
 
 type Permission struct {
-	ID     uint `gorm:"primaryKey"`
-	Type   enums.Permission
-	RoleID uint
+	gorm.Model
+	Type        enums.Permission
+	Description string
 }

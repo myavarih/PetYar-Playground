@@ -24,7 +24,34 @@ func NewPostgresDatabase() *gorm.DB {
 
 		dbInstance = db
 
-		dbInstance.AutoMigrate(&entities.User{}, entities.Role{}, entities.Permission{})
+		db.Migrator().DropTable(
+			&entities.User{},
+			&entities.Role{},
+			&entities.Permission{},
+			&entities.Wallet{},
+			&entities.Request{},
+			&entities.CalenderSlot{},
+			entities.Pet{},
+			entities.PetSitter{},
+			entities.Reserve{},
+			entities.Service{},
+			entities.Chat{},
+			entities.Comment{},
+		)
+		db.AutoMigrate(
+			&entities.User{},
+			&entities.Role{},
+			&entities.Permission{},
+			&entities.Wallet{},
+			&entities.Request{},
+			&entities.CalenderSlot{},
+			entities.Pet{},
+			entities.PetSitter{},
+			entities.Reserve{},
+			entities.Service{},
+			entities.Chat{},
+			entities.Comment{},
+		)
 
 	})
 	return dbInstance

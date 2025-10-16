@@ -1,13 +1,8 @@
 package service
 
 import (
-	"hona/backend/internal/application/dto/rbac"
-	"hona/backend/internal/application/dto/user"
-	"hona/backend/internal/domain/exceptions"
 	"hona/backend/internal/infrastructure/jwt"
 	"hona/backend/internal/infrastructure/repository/postgres"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService struct {
@@ -22,36 +17,36 @@ func NewUserService(unitOfWork *postgres.UnitOfWork, jwtService *jwt.JWTService)
 	}
 }
 
-func (us *UserService) Login(loginInfo user.LoginRequest) user.LoginResponse {
-	foundUser := us.unitOfWork.Factory().UserRepository().FindUserByEmail(loginInfo.Email)
+// func (us *UserService) Login(loginInfo user.LoginRequest) user.LoginResponse {
+// 	foundUser := us.unitOfWork.Factory().UserRepository().FindUserByEmail(loginInfo.Email)
 
-	if err := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(loginInfo.Password)); err != nil {
-		invalidCredentialsErr := &exceptions.AuthError{
-			Type: "INVALID_CREDENTIALS",
-		}
-		panic(invalidCredentialsErr)
-	}
+// 	if err := bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(loginInfo.Password)); err != nil {
+// 		invalidCredentialsErr := &exceptions.AuthError{
+// 			Type: "INVALID_CREDENTIALS",
+// 		}
+// 		panic(invalidCredentialsErr)
+// 	}
 
-	accessToken, refreshToken := us.jwtService.GenerateTokens(foundUser.ID)
+// 	accessToken, refreshToken := us.jwtService.GenerateTokens(foundUser.ID)
 
-	permissions := foundUser.Role.Permissions
+// 	permissions := foundUser.Role.Permissions
 
-	p := make([]rbac.PermissionResponse, 0)
+// 	p := make([]rbac.PermissionResponse, 0)
 
-	for _, per := range permissions {
-		p = append(p, rbac.PermissionResponse{
-			ID:   per.ID,
-			Name: per.Type.String(),
-		})
-	}
+// 	for _, per := range permissions {
+// 		p = append(p, rbac.PermissionResponse{
+// 			ID:   per.ID,
+// 			Name: per.Type.String(),
+// 		})
+// 	}
 
-	return user.LoginResponse{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-		Role: rbac.RoleResponse{
-			ID:          foundUser.Role.ID,
-			Name:        foundUser.Role.Type.String(),
-			Permissions: p,
-		},
-	}
-}
+// 	return user.LoginResponse{
+// 		AccessToken:  accessToken,
+// 		RefreshToken: refreshToken,
+// 		Role: rbac.RoleResponse{
+// 			ID:          foundUser.Role.ID,
+// 			Name:        foundUser.Role.Type.String(),
+// 			Permissions: p,
+// 		},
+// 	}
+// }
