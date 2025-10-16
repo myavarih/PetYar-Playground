@@ -1,23 +1,15 @@
 package httpv1
 
 import (
-	"hona/backend/internal/application/service"
-	"hona/backend/internal/infrastructure/jwt"
-	"hona/backend/internal/infrastructure/repository/postgres"
-	"hona/backend/internal/presentation/controllers/v1/general"
+	"hona/backend/wire"
 
 	"github.com/gin-gonic/gin"
 )
 
-func SetUpGeneralRoutes(v1 *gin.RouterGroup) {
-	db := postgres.NewPostgresDatabase()
-	u := postgres.NewUnitOfWork(db.DB)
-	js := jwt.NewJWTService(jwt.NewJWTKeyManager())
-	s := service.NewUserService(u, js)
-	gc := general.NewGeneralController(s)
+func SetUpGeneralRoutes(v1 *gin.RouterGroup, app *wire.Application) {
 
 	auth := v1.Group("/auth")
 	{
-		auth.POST("/login", gc.Login)
+		auth.POST("/login", app.Controllers.GeneralControllers.GeneralAuthController.Login)
 	}
 }

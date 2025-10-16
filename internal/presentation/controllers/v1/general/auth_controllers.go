@@ -8,17 +8,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type GeneralController struct {
+type GeneralAuthController struct {
 	generalService *service.UserService
 }
 
-func NewGeneralController(generalService *service.UserService) *GeneralController {
-	return &GeneralController{
+func NewGeneralAuthController(generalService *service.UserService) *GeneralAuthController {
+	return &GeneralAuthController{
 		generalService: generalService,
 	}
 }
 
-func (gc *GeneralController) Login(ctx *gin.Context) {
+func (gc *GeneralAuthController) Login(ctx *gin.Context) {
 	type loginParams struct {
 		Email    string `json:"email" validate:"required,email"`
 		Password string `json:"password" validate:"required,min=8,max=64"`

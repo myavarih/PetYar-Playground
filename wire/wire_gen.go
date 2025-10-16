@@ -9,38 +9,79 @@ package wire
 import (
 	"github.com/google/wire"
 	"hona/backend/bootstrap"
+	"hona/backend/internal/application/service"
+	"hona/backend/internal/infrastructure/jwt"
 	"hona/backend/internal/infrastructure/repository/postgres"
+	"hona/backend/internal/presentation/controllers/v1/general"
+	"hona/backend/internal/presentation/middleware"
 )
 
 // Injectors from wire.go:
 
 func InitializeApplication(container *bootstrap.Config) (*Application, error) {
-	postgresDatabase := postgres.NewPostgresDatabase()
-	database := &Database{
-		DB: postgresDatabase,
+	db := postgres.NewPostgresDatabase()
+	unitOfWork := postgres.NewUnitOfWork(db)
+	jwtKeyManager := jwt.NewJWTKeyManager()
+	jwtService := jwt.NewJWTService(jwtKeyManager)
+	userService := service.NewUserService(unitOfWork, jwtService)
+	generalAuthController := general.NewGeneralAuthController(userService)
+	generalControllers := &GeneralControllers{
+		GeneralAuthController: generalAuthController,
 	}
-	application := NewApplication(database)
+	controllers := &Controllers{
+		GeneralControllers: generalControllers,
+	}
+	localizationMiddleware := middleware.NewLocalizationMiddleware()
+	recoveryMiddleware := middleware.NewRecoveryMiddleware()
+	middlewares := &Middlewares{
+		LocalizationMiddleware: localizationMiddleware,
+		RecoveryMiddleware:     recoveryMiddleware,
+	}
+	application := NewApplication(controllers, middlewares)
 	return application, nil
 }
 
 // wire.go:
 
-var DatabaseProviderSet = wire.NewSet(postgres.NewPostgresDatabase, wire.Bind(new(postgres.Database), new(*postgres.PostgresDatabase)), wire.Struct(new(Database), "*"))
+var RepositoryProviderSet = wire.NewSet(postgres.NewUserRepository, postgres.NewUnitOfWork, postgres.NewPostgresDatabase)
+
+var ServiceProviderSet = wire.NewSet(service.NewUserService, jwt.NewJWTService, jwt.NewJWTKeyManager)
+
+var GeneralControllersProviderSet = wire.NewSet(general.NewGeneralAuthController, wire.Struct(new(GeneralControllers), "*"))
+
+var ControllersProviderSet = wire.NewSet(wire.Struct(new(Controllers), "*"))
+
+var MiddlewaresProviderSet = wire.NewSet(middleware.NewLocalizationMiddleware, middleware.NewRecoveryMiddleware, wire.Struct(new(Middlewares), "*"))
 
 var ProviderSet = wire.NewSet(
-	DatabaseProviderSet,
+	MiddlewaresProviderSet,
+	ControllersProviderSet,
+	GeneralControllersProviderSet,
+	ServiceProviderSet,
+	RepositoryProviderSet,
 )
 
-type Database struct {
-	DB postgres.Database
+type GeneralControllers struct {
+	GeneralAuthController *general.GeneralAuthController
+}
+
+type Controllers struct {
+	GeneralControllers *GeneralControllers
+}
+
+type Middlewares struct {
+	LocalizationMiddleware *middleware.LocalizationMiddleware
+	RecoveryMiddleware     *middleware.RecoveryMiddleware
 }
 
 type Application struct {
-	Database *Database
+	Controllers *Controllers
+	Middlewares *Middlewares
 }
 
-func NewApplication(db *Database) *Application {
+func NewApplication(controllers *Controllers, middlewares *Middlewares) *Application {
 	return &Application{
-		Database: db,
+		Controllers: controllers,
+		Middlewares: middlewares,
 	}
 }

@@ -5,32 +5,73 @@ package wire
 
 import (
 	"hona/backend/bootstrap"
+
+	"hona/backend/internal/application/service"
+	"hona/backend/internal/infrastructure/jwt"
 	"hona/backend/internal/infrastructure/repository/postgres"
+	"hona/backend/internal/presentation/controllers/v1/general"
+	"hona/backend/internal/presentation/middleware"
 
 	"github.com/google/wire"
 )
 
-var DatabaseProviderSet = wire.NewSet(
+var RepositoryProviderSet = wire.NewSet(
+	postgres.NewUserRepository,
+	postgres.NewUnitOfWork,
 	postgres.NewPostgresDatabase,
-	wire.Bind(new(postgres.Database), new(*postgres.PostgresDatabase)),
-	wire.Struct(new(Database), "*"),
+)
+
+var ServiceProviderSet = wire.NewSet(
+	service.NewUserService,
+	jwt.NewJWTService,
+	jwt.NewJWTKeyManager,
+)
+
+var GeneralControllersProviderSet = wire.NewSet(
+	general.NewGeneralAuthController,
+	wire.Struct(new(GeneralControllers), "*"),
+)
+
+var ControllersProviderSet = wire.NewSet(
+	wire.Struct(new(Controllers), "*"),
+)
+
+var MiddlewaresProviderSet = wire.NewSet(
+	middleware.NewLocalizationMiddleware,
+	middleware.NewRecoveryMiddleware,
+	wire.Struct(new(Middlewares), "*"),
 )
 
 var ProviderSet = wire.NewSet(
-	DatabaseProviderSet,
+	MiddlewaresProviderSet,
+	ControllersProviderSet,
+	GeneralControllersProviderSet,
+	ServiceProviderSet,
+	RepositoryProviderSet,
 )
 
-type Database struct {
-	DB postgres.Database
+type GeneralControllers struct {
+	GeneralAuthController *general.GeneralAuthController
+}
+
+type Controllers struct {
+	GeneralControllers *GeneralControllers
+}
+
+type Middlewares struct {
+	LocalizationMiddleware *middleware.LocalizationMiddleware
+	RecoveryMiddleware     *middleware.RecoveryMiddleware
 }
 
 type Application struct {
-	Database *Database
+	Controllers *Controllers
+	Middlewares *Middlewares
 }
 
-func NewApplication(db *Database) *Application {
+func NewApplication(controllers *Controllers, middlewares *Middlewares) *Application {
 	return &Application{
-		Database: db,
+		Controllers: controllers,
+		Middlewares: middlewares,
 	}
 }
 
