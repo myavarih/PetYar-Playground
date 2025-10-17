@@ -3,6 +3,7 @@ package middleware
 import (
 	"net/http"
 
+	"hona/backend/bootstrap"
 	"hona/backend/internal/infrastructure/translation"
 
 	"github.com/gin-gonic/gin"
@@ -10,10 +11,13 @@ import (
 
 // ? what should it have?
 type LocalizationMiddleware struct {
+	context *bootstrap.Context
 }
 
-func NewLocalizationMiddleware() *LocalizationMiddleware {
-	return &LocalizationMiddleware{}
+func NewLocalizationMiddleware(context *bootstrap.Context) *LocalizationMiddleware {
+	return &LocalizationMiddleware{
+		context: context,
+	}
 }
 
 func GetLocale(request *http.Request) string {
@@ -25,7 +29,7 @@ func (lm *LocalizationMiddleware) AddTranslator(ctx *gin.Context) {
 
 	trans := translation.GetTranslator(locale)
 
-	ctx.Set("translator", trans)
+	ctx.Set(lm.context.Translator, trans)
 
 	ctx.Next()
 }
