@@ -10,6 +10,7 @@ import (
 )
 
 type AuthMiddleware struct {
+	// TODO: input context from bootstrap
 	jwtService *jwt.JWTService
 }
 
@@ -38,7 +39,7 @@ func (am *AuthMiddleware) AuthRequired(ctx *gin.Context) {
 		panic(unauthorizedError)
 	}
 
-	userID := am.jwtService.ValidateToken(tokenString)
+	userID := am.jwtService.ValidateToken(tokenString, "access")
 
 	ctx.Set(bootstrap.ProjectConfig.Constants.Context.ID, userID)
 

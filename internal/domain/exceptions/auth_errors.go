@@ -4,11 +4,13 @@ import (
 	"fmt"
 )
 
+// TODO: should be in constants
 const (
 	ErrorTypeInvalidCredentials = "INVALID_CREDENTIALS"
 	ErrorTypeExpiredToken       = "EXPIRED_TOKEN"
 	ErrorTypeInvalidToken       = "INVALID_TOKEN"
 	ErrorTypeUnauthorized       = "UNAUTHORIZED"
+	ErrorTypeAccessDenied       = "ACCESS_DENIED"
 )
 
 type AuthError struct {
@@ -51,6 +53,17 @@ func NewUnauthorizedError(message string) *AuthError {
 
 	return &AuthError{
 		Type:    ErrorTypeUnauthorized,
+		Message: message,
+	}
+}
+
+func NewAccessDeniedError(message string) *AuthError {
+	if message == "" {
+		message = "Access Denied"
+	}
+
+	return &AuthError{
+		Type:    ErrorTypeAccessDenied,
 		Message: message,
 	}
 }

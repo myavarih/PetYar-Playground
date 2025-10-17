@@ -1,8 +1,10 @@
 package general
 
 import (
+	"hona/backend/internal/application/dto/user"
 	"hona/backend/internal/application/service"
 	"hona/backend/internal/presentation/controllers"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,17 +25,27 @@ func (gc *GeneralAuthController) Login(ctx *gin.Context) {
 		Password string `json:"password" validate:"required,min=8,max=64"`
 	}
 
-	// params := controllers.Receive[loginParams](ctx)
-	// loginInfo := user.LoginRequest{
-	// 	Email:    params.Email,
-	// 	Password: params.Password,
-	// }
+	params := controllers.Receive[loginParams](ctx)
+	loginInfo := user.LoginRequest{
+		Email:    params.Email,
+		Password: params.Password,
+	}
 
-	// res := gc.generalService.Login(loginInfo)
+	res, refreshToken := gc.generalService.Login(loginInfo)
+
+	ctx.SetCookie(
+		"refreshToken",
+		refreshToken,
+		int(time.Hour.Seconds()*7*24),
+		"/",
+		"",
+		true,
+		true,
+	)
 
 	msg := controllers.Message{
 		Text:   "successMessage.login",
 		Params: []string{},
 	}
-	controllers.Respond(ctx, 200, msg, nil)
+	controllers.Respond(ctx, 200, msg, res)
 }

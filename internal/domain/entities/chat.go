@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Chat struct {
 	gorm.Model
-	History            string // don't know how to store it
+	Messages           []TextMessage `gorm:"foreignKey:ChatID"`
 	IsUserBlocked      bool
 	IsPetSitterBlocked bool
 	IsAccepted         bool

@@ -84,14 +84,30 @@ func handleNotFoundError(notFoundErr *exceptions.NotFoundError) ([]controllers.M
 }
 
 func handleAuthError(authErr *exceptions.AuthError) ([]controllers.Message, int) {
-	if authErr.Type == "INVALID_CREDENTIALS" {
+	switch authErr.Type {
+	case "INVALID_CREDENTIALS":
 		msg := controllers.Message{
 			Text: "errors.invalidAuthCredentials",
 		}
 		return []controllers.Message{msg}, 401
-	} else if authErr.Type == "UNAUTHORIZED" {
+	case "UNAUTHORIZED":
 		msg := controllers.Message{
 			Text: "errors.unauthorized",
+		}
+		return []controllers.Message{msg}, 401
+	case "ACCESS_DENIED":
+		msg := controllers.Message{
+			Text: "errors.accessDenied",
+		}
+		return []controllers.Message{msg}, 401
+	case "EXPIRED_TOKEN":
+		msg := controllers.Message{
+			Text: "errors.expiredAuthToken",
+		}
+		return []controllers.Message{msg}, 401
+	case "INVALID_TOKEN":
+		msg := controllers.Message{
+			Text: "errors.invalidAuthToken",
 		}
 		return []controllers.Message{msg}, 401
 	}

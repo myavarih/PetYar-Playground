@@ -39,19 +39,21 @@ func (js *JWTService) GenerateTokens(userID uint) (accessTokenString string, ref
 
 func (js *JWTService) GenerateClaims(userID uint) (accessTokenClaims jwt.MapClaims, refreshTokenClaims jwt.MapClaims) {
 	accessTokenClaims = jwt.MapClaims{
-		"sub": userID,
-		"exp": time.Now().Add(time.Minute * 2).Unix(),
-		"iat": time.Now().Unix(),
+		"sub":  userID,
+		"exp":  time.Now().Add(time.Minute * 2).Unix(),
+		"iat":  time.Now().Unix(),
+		"type": "access",
 	}
 	refreshTokenClaims = jwt.MapClaims{
-		"sub": userID,
-		"exp": time.Now().Add(time.Hour * 24 * 7).Unix(),
-		"iat": time.Now().Unix(),
+		"sub":  userID,
+		"exp":  time.Now().Add(time.Hour * 24 * 7).Unix(),
+		"iat":  time.Now().Unix(),
+		"type": "refresh",
 	}
 	return
 }
 
-func (js *JWTService) ValidateToken(tokenString string) uint {
+func (js *JWTService) ValidateToken(tokenString string, tokenType string) uint {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, exceptions.NewInvalidTokenError()
@@ -79,12 +81,17 @@ func (js *JWTService) ValidateToken(tokenString string) uint {
 		panic(invalidTokenErr)
 	}
 
+	if claims["type"] != tokenType {
+		invalidTokenErr := exceptions.NewInvalidTokenError()
+		panic(invalidTokenErr)
+	}
+
 	userID := uint(claims["sub"].(float64))
 	return userID
 }
 
 func (js *JWTService) RefreshTokens(refreshTokenString string) (accessTokenString string, newRefreshTokenString string) {
-	userID := js.ValidateToken(refreshTokenString)
+	userID := js.ValidateToken(refreshTokenString, "refresh")
 
 	accessTokenString, newRefreshTokenString = js.GenerateTokens(userID)
 	return
