@@ -6,3 +6,8 @@ type LoginResponse struct {
 	AccessToken string                    `json:"accessToken"`
 	Permissions []rbac.PermissionResponse `json:"permissions"`
 }
+
+type RefreshTokenResponse struct {
+	AccessToken string                    `json:"accessToken"`
+	Permissions []rbac.PermissionResponse `json:"permissions"`
+}

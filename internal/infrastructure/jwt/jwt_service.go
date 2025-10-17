@@ -18,8 +18,8 @@ func NewJWTService(keyManager *JWTKeyManager) *JWTService {
 	}
 }
 
-func (js *JWTService) GenerateTokens(userID uint) (accessTokenString string, refreshTokenString string) {
-	accessTokenClaims, refreshTokenClaims := js.GenerateClaims(userID)
+func (js *JWTService) GenerateTokens(userID uint, rememberMe bool) (accessTokenString string, refreshTokenString string) {
+	accessTokenClaims, refreshTokenClaims := js.GenerateClaims(userID, rememberMe)
 
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodRS256, accessTokenClaims)
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodRS256, refreshTokenClaims)
@@ -37,18 +37,27 @@ func (js *JWTService) GenerateTokens(userID uint) (accessTokenString string, ref
 	return
 }
 
-func (js *JWTService) GenerateClaims(userID uint) (accessTokenClaims jwt.MapClaims, refreshTokenClaims jwt.MapClaims) {
+func (js *JWTService) GenerateClaims(userID uint, rememberMe bool) (accessTokenClaims jwt.MapClaims, refreshTokenClaims jwt.MapClaims) {
 	accessTokenClaims = jwt.MapClaims{
 		"sub":  userID,
 		"exp":  time.Now().Add(time.Minute * 2).Unix(),
 		"iat":  time.Now().Unix(),
 		"type": "access",
 	}
-	refreshTokenClaims = jwt.MapClaims{
-		"sub":  userID,
-		"exp":  time.Now().Add(time.Hour * 24 * 7).Unix(),
-		"iat":  time.Now().Unix(),
-		"type": "refresh",
+	if rememberMe {
+		refreshTokenClaims = jwt.MapClaims{
+			"sub":  userID,
+			"exp":  time.Now().Add(time.Hour * 24 * 7).Unix(),
+			"iat":  time.Now().Unix(),
+			"type": "refresh",
+		}
+	} else {
+		refreshTokenClaims = jwt.MapClaims{
+			"sub":  userID,
+			"exp":  time.Now().Add(time.Hour * 24 * 2).Unix(),
+			"iat":  time.Now().Unix(),
+			"type": "refresh",
+		}
 	}
 	return
 }
@@ -90,9 +99,9 @@ func (js *JWTService) ValidateToken(tokenString string, tokenType string) uint {
 	return userID
 }
 
-func (js *JWTService) RefreshTokens(refreshTokenString string) (accessTokenString string, newRefreshTokenString string) {
-	userID := js.ValidateToken(refreshTokenString, "refresh")
+func (js *JWTService) RefreshTokens(refreshTokenString string) (accessTokenString string, newRefreshTokenString string, userID uint) {
+	userID = js.ValidateToken(refreshTokenString, "refresh")
 
-	accessTokenString, newRefreshTokenString = js.GenerateTokens(userID)
+	accessTokenString, newRefreshTokenString = js.GenerateTokens(userID, false)
 	return
 }

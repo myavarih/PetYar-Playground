@@ -21,14 +21,16 @@ func NewGeneralAuthController(generalService *service.UserService) *GeneralAuthC
 
 func (gc *GeneralAuthController) Login(ctx *gin.Context) {
 	type loginParams struct {
-		Email    string `json:"email" validate:"required,email"`
-		Password string `json:"password" validate:"required,min=8,max=64"`
+		Email      string `json:"email" validate:"required,email"`
+		Password   string `json:"password" validate:"required,min=8,max=64"`
+		RememberMe bool   `json:"rememberMe"`
 	}
 
 	params := controllers.Receive[loginParams](ctx)
 	loginInfo := user.LoginRequest{
-		Email:    params.Email,
-		Password: params.Password,
+		Email:      params.Email,
+		Password:   params.Password,
+		RememberMe: params.RememberMe,
 	}
 
 	res, refreshToken := gc.generalService.Login(loginInfo)
@@ -45,6 +47,35 @@ func (gc *GeneralAuthController) Login(ctx *gin.Context) {
 
 	msg := controllers.Message{
 		Text:   "successMessage.login",
+		Params: []string{},
+	}
+	controllers.Respond(ctx, 200, msg, res)
+}
+
+func (gc *GeneralAuthController) RefreshTokens(ctx *gin.Context) {
+	type refreshTokenParams struct {
+		RefreshToken string `json:"refreshToken"`
+	}
+
+	params := controllers.Receive[refreshTokenParams](ctx)
+	refreshTokenInfo := user.RefreshTokenRequest{
+		RefreshToken: params.RefreshToken,
+	}
+
+	res, refreshToken := gc.generalService.RefreshToken(refreshTokenInfo)
+
+	ctx.SetCookie(
+		"refreshToken",
+		refreshToken,
+		int(time.Hour.Seconds()*7*24),
+		"/",
+		"",
+		true,
+		true,
+	)
+
+	msg := controllers.Message{
+		Text:   "successMessage.refreshToken",
 		Params: []string{},
 	}
 	controllers.Respond(ctx, 200, msg, res)

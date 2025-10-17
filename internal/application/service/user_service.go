@@ -32,7 +32,7 @@ func (us *UserService) Login(loginInfo user.LoginRequest) (user.LoginResponse, s
 		panic(invalidCredentialsErr)
 	}
 
-	accessToken, refreshToken := us.jwtService.GenerateTokens(foundUser.ID)
+	accessToken, refreshToken := us.jwtService.GenerateTokens(foundUser.ID, loginInfo.RememberMe)
 
 	p := make([]rbac.PermissionResponse, 0)
 	for _, role := range foundUser.Roles {
@@ -45,6 +45,27 @@ func (us *UserService) Login(loginInfo user.LoginRequest) (user.LoginResponse, s
 	}
 
 	return user.LoginResponse{
+		AccessToken: accessToken,
+		Permissions: p,
+	}, refreshToken
+}
+
+func (us *UserService) RefreshToken(refreshTokenInfo user.RefreshTokenRequest) (user.RefreshTokenResponse, string) {
+	accessToken, refreshToken, userID := us.jwtService.RefreshTokens(refreshTokenInfo.RefreshToken)
+
+	foundUser := us.unitOfWork.Factory().UserRepository().FindUserByID(userID)
+
+	p := make([]rbac.PermissionResponse, 0)
+	for _, role := range foundUser.Roles {
+		for _, per := range role.Permissions {
+			p = append(p, rbac.PermissionResponse{
+				ID:   per.ID,
+				Name: per.Type.String(),
+			})
+		}
+	}
+
+	return user.RefreshTokenResponse{
 		AccessToken: accessToken,
 		Permissions: p,
 	}, refreshToken

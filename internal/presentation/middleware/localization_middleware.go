@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// ? what should it have?
 type LocalizationMiddleware struct {
 	context *bootstrap.Context
 }
